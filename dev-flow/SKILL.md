@@ -1,336 +1,261 @@
 ---
 name: dev-flow
 description: >
-  Full-cycle development workflow for AI-assisted coding. Plan, diagnose, implement,
-  verify, sync, ship. Encodes battle-tested habits: pre-work planning, surgical coding,
-  knowledge sync, issue tracking, clean Git hygiene. Integrates industry patterns:
-  YAGNI, Rule of Three, Test-Driven Bug Fixing, Graceful Degradation, SemVer,
-  Configuration-Driven Development, Network-Aware Coding.
-  Trigger when: starting new work, completing a phase, "dev flow", "按流程走", "标准流程".
-  NOT for trivial one-liner fixes.
+  Self-contained, universal development workflow for AI-assisted coding.
+  Plan, diagnose, implement, verify, sync, ship. Works standalone on any project.
+  No external skill dependencies. Integrates industry best practices: YAGNI,
+  Rule of Three, Test-Driven Bug Fixing, Graceful Degradation, SemVer.
+  Trigger when: starting new work, completing a phase, "dev flow",
+  "开发流程", "按流程走", "标准流程". NOT for one-liner fixes.
 ---
 
-# Dev-Flow — AI-Assisted Development Workflow
+# Dev-Flow — 通用 AI 开发工作流
 
-> Full-cycle workflow. From idea to shipped commit. Cross-platform.
+> 自包含、零依赖、适用任何项目的开发工作流。Clone 即用。
 
-## Core Philosophy
+## 设计原则
 
-Development is not "writing code" — it is "delivering value". Code is 50%.
-The other 50%: verification, sync, docs, shipping.
-
-Five principles:
-
-1. **Plan before coding** — Verifiable steps before any code
-2. **Surgical changes only** — Every line traces to the request
-3. **Verify immediately** — Syntax → Import → Functional, in order
-4. **Sync immediately** — Docs follow code; never lag behind
-5. **Ship immediately** — Atomic commits, push right after
+这个 skill 不依赖任何其他 skill，不绑定任何具体项目、工具链或语言。
+你可以把它放进任何项目，Agent 读取后就能按照完整流程工作。
 
 ---
 
-## Standard Workflow (6 Steps)
+## 六步工作流
 
 ```
 Plan → Diagnose → Implement → Verify → Sync → Ship
   ^                                              |
-  +————— if verify fails ———————————————————————+
+  +———————— if verify fails ————————————————————+
 ```
 
-### Step 1: Plan
+### Step 1: Plan（规划）
 
-Input: user request
-Output: plan (3-6 verifiable steps)
+**输入**：用户需求
+**输出**：3-6 个可验证的步骤
 
-- Decompose request into verifiable steps; each with a verification criterion
-- Mark first step `in_progress`; keep exactly one active
-- If ambiguous, ask before planning — don't guess
+- 把需求拆成可验证的步骤，每一步附验证方式（如"语法检查通过"、"import 成功"）
+- 标记第一步为 `in_progress`，始终保持只有一个进行中
+- 需求模糊时先问清楚，不要猜
 
-### Step 2: Diagnose
+### Step 2: Diagnose（诊断）
 
-Input: planned steps
-Output: understanding what to change, where, and why
+**输入**：已规划步骤
+**输出**：明确要改什么、在哪里、为什么
 
-- **Read code first, write code second**. Never assume structure.
-- `rg` to trace all hardcoded references (especially config key names)
-- Map data flow: source → layers → destination. Know which fields each layer consumes.
-- **For bugs**: reproduce first, then fix. Unreproducible = unverifiable.
+- **先读代码，后写代码**。不要假设代码结构
+- 用 grep 追踪所有硬编码引用（特别是涉及配置键名时）
+- 理清数据流：数据从哪来、经过哪些层、最终到哪
+- **修 Bug 时**：先复现，再修复。复现不了的 Bug 验证不了
 
-### Step 3: Implement
+### Step 3: Implement（实现）
 
-Input: diagnosis results
-Output: modified code (syntax-clean)
+**输入**：诊断结论
+**输出**：语法正确的修改代码
 
-- **Surgical**: every changed line traces to the request
-- **Style-consistent**: match existing patterns, even if you'd do it differently
-- **No speculation**: don't build for unrequested future needs
+- **手术级精准**：每条改动都能追溯到用户需求
+- **风格一致**：匹配现有代码风格，即使你觉得有更好的写法
+- **不写推测性代码**：不为"未来可能需要"写任何东西
 
-**Config/YAML change checklist:**
-- [ ] `rg "old_key"` across entire project before rename
-- [ ] Field available in all active data sources
-- [ ] CLI help text updated
-- [ ] User manual updated
+### Step 4: Verify（验证）
 
-### Step 4: Verify
+**输入**：修改后的代码
+**输出**：已验证的代码
 
-Input: modified code
-Output: verified code
+三层递进，每层必须通过：
 
-Three layers, must pass each before proceeding:
-
-```python
-# L1: Syntax
-python -c "import py_compile; py_compile.compile('file.py', doraise=True)"
-
-# L2: Import
-python -c "from module import Class; print('OK')"
-
-# L3: Functional
-python tests/test_xxx.py
+```
+L1: 语法检查  →  L2: 导入检查  →  L3: 功能验证
 ```
 
-- **For bugs**: write failing test BEFORE fixing, then verify it passes
-- If any layer fails, return to Step 3 — don't skip
+- 如果项目有测试套件，运行相关测试
+- **修 Bug 时**：先写一个复现 Bug 的测试，修完确认通过
+- 任何一层失败都必须回到 Step 3
 
-### Step 5: Sync
+### Step 5: Sync（同步）
 
-Input: verified code
-Output: updated documentation
+**输入**：已验证的代码
+**输出**：已更新的文档
 
-| Change Type | Docs to Sync |
-|------------|-------------|
-| New command/parameter | Manual + help text |
-| New feature/module | README + milestone docs |
-| Bug fix | ISSUES.md |
-| Config change | Manual + AGENTS.md |
-| Architecture change | Architecture docs |
+**代码改了，文档必须跟上。** 同步范围：
 
-**Sync principles:**
-- **No duplication**: README=architecture, manual=commands, milestones=progress
-- **Delete > retain**: outdated descriptions, deprecated examples — delete them
-- **AGENTS.md net growth ≤ 30 lines**: if more, you're writing changelog, not manual
+| 改动类型 | 需同步的文档 |
+|---------|------------|
+| 新增命令/参数 | 使用手册 + 帮助文本 |
+| 新增功能/模块 | README + 版本记录 |
+| Bug 修复 | Issue 追踪文件 |
+| 配置变更 | 使用手册配置章节 |
+| 架构变化 | 架构文档 |
 
-### Step 6: Ship (Commit & Push)
+同步原则：
+- **不重复**：README 写架构、手册写命令、里程碑写进度，各司其职
+- **敢删**：过时的描述、废弃的命令示例——删掉
+- **项目入口文件（AGENTS.md/CLAUDE.md）净增 ≤ 30 行**：超过就是在写变更日志，应归入版本历史
 
-Input: synced docs
-Output: commit on GitHub
+### Step 6: Ship（交付）
 
-```bash
-git add <files>
-git commit -m "type: what changed, why, impact scope"
-git push
-```
+**输入**：已同步的文档
+**输出**：GitHub 上的提交
 
-**Commit discipline:**
-- **Atomic**: one logical change per commit
-- **Descriptive**: explain what, why, impact — never "fix bugs"
-- **Push immediately**: never batch commits locally
-- **Tag releases**: `git tag v0.x.y` after milestone completion
+- **原子提交**：一次一个逻辑变更，不攒 10 个改动一起提交
+- **描述性提交信息**：写清楚改了什么、为什么、影响范围
+- **立即推送**：不在本地积压提交
+- **打标签**：里程碑完成后 `git tag v0.x.y`
 
 ---
 
-## Industry Best Practices
+## 内建最佳实践
 
-### YAGNI (You Ain't Gonna Need It)
-Don't build for unrequested future needs. Every line has maintenance cost.
-Speculative code is negative value.
+以下实践已融入工作流各步骤，无需额外配置。
 
-### Boy Scout Rule
-Leave code cleaner than you found it. BUT: only clean orphans from YOUR changes.
-Never refactor unrelated code "while you're here".
+### YAGNI（你不会需要它）
+不为没被要求的功能写代码。每行代码都有维护成本，推测性代码是负资产。
 
-### Single Responsibility
-One function, one thing. If >50 lines, consider splitting.
-If you need "and" to describe a function, it does too much.
+### 三次法则
+- 第一次：直接写
+- 第二次：复制并标记 `# TODO: 提取`
+- 第三次：重构为共享工具
 
-### Fail Fast
-Validate at function entry. Bad data returns immediately with a clear message.
-Don't let errors propagate through layers.
+过早抽象比重复更糟。等模式自行证明。
 
-### Separation of Concerns
-Data fetching → Business logic → Presentation. Three layers, no intrusion.
-Changing UI must not require changing DB layer.
+### 测试驱动的 Bug 修复
+1. 写一个复现 Bug 的失败测试
+2. 应用修复
+3. 确认测试通过
+4. 测试和修复一起提交
 
-### The Rule of Three
-- 1st time: write it
-- 2nd time: copy with `# TODO: extract`
-- 3rd time: refactor into shared utility
+### 优雅降级
+当系统依赖多个外部数据源时：
+```
+主源 → 备用1 → 备用2 → 软失败
+```
+- 每个降级有明确的触发条件
+- 绝不静默返回不完整数据
+- 网络错误做指数退避重试
 
-Premature abstraction > duplication. Wait for the pattern to prove itself.
+### 语义化版本
+`vMAJOR.MINOR.PATCH` — MAJOR：不兼容变更，MINOR：向后兼容新功能，PATCH：Bug 修复。
 
-### Test-Driven Bug Fixing
-1. Write failing test that reproduces the bug
-2. Apply the fix
-3. Verify test passes
-4. Commit test + fix together
+### 尽早失败
+函数入口处校验输入，无效输入立即返回清晰消息。不让错误数据在层级间传播。
 
-### Semantic Versioning
-`vMAJOR.MINOR.PATCH` — MAJOR: breaking, MINOR: new feature (compatible), PATCH: bug fix.
+### 单一职责
+一个函数做一件事。超过 50 行考虑拆分。如果需要用"和"来描述函数功能，那它做太多了。
+
+### 关注点分离
+数据获取 → 业务逻辑 → 展示，三层独立。改 UI 不应要求改数据库层。
 
 ---
 
-## Battle-Tested Patterns
+## 通用实战模式
 
-### Configuration-Driven Development
+### 配置驱动的开发
 
-Config key names are API contracts. Treat renaming as breaking changes.
+配置键名是 API 契约。重命名等同于 Breaking Change。
 
-**Before renaming a config key:**
-- [ ] `rg "old_key"` across entire project (Python + YAML + docs + tests)
-- [ ] Check test fixtures and expected outputs
-- [ ] Check CLI help text and manuals
+**改名前**：grep 整个项目（代码 + 配置 + 文档 + 测试）
+**改名后**：跑完整测试套件 + 手动测试受影响命令
 
-**After renaming:**
-- [ ] Full test suite
-- [ ] Manual test of affected CLI commands
-- [ ] Update ISSUES.md if the change fixes a bug
+### 脚本生命周期
 
-### Graceful Degradation (Multi-Source Data)
+- 临时脚本：用完即删，不提交
+- 常驻脚本：clone 后必须开箱即用，环境假设需在项目入口文件中说明
+
+### Issue 追踪规范
 
 ```
-Primary → Fallback1 → Fallback2 → Soft Failure
+### ISS-XXX: 简短描述
+- 状态: done | in_progress | pending
+- 优先级: P0(阻塞) | P1(重要) | P2(普通) | P3(可选)
+- 描述: 一句话说明
+- 方向: 所属功能/里程碑
+- 依赖: ISS-xxx
+- 更新日志: 倒序状态变更 + 日期
 ```
 
-- Each fallback needs a clear trigger (timeout, error code, missing field)
-- Never silently return partial data — log WARNING at minimum
-- Missing optional fields → skip dependent filters, don't crash
-- Network errors → exponential backoff (1s, 2s, 4s) then degrade
-- Document: which fields each source provides, which are missing
+规则：发现 Bug 先编号再修复；验证通过后立即标记已解决。
 
-**Anti-pattern**: `except Exception: return {}` — masks real bugs.
+### 终端/CLI 体验
 
-### Script Lifecycle
-
-Temporary scripts:
-- Prefix: `_xxx.py` (underscore = disposable)
-- Delete after use, never commit
-- If permanent, move to `tests/test_xxx.py`, remove underscore
-
-Permanent scripts:
-- Must work after fresh clone
-- Dependencies installable via documented method
-- Environmental assumptions documented in AGENTS.md
-
-### Network-Aware Coding
-
-- **Proxy bypass**: financial APIs often fail through corporate proxies
-- **Git + proxy**: `git -c http.proxy= -c https.proxy= push` when blocked
-- **Timeout everything**: default 15s, critical paths 5s
-- **Retry with backoff**: 1-3 retries for transient failures
-
-### Issue Tracking Discipline
-
-```
-### ISS-XXX: short description
-- Status: done | in_progress | pending
-- Priority: P0(critical) | P1(important) | P2(normal) | P3(optional)
-- Description: one sentence
-- Direction: feature area / milestone phase
-- Dependencies: ISS-xxx, ISS-yyy
-- Update log: reverse chronological, with dates
-```
-
-**Rules:**
-- Every bug found gets ISS number BEFORE fixing
-- Mark resolved after verification, not after coding
-- P0 blocks milestone; P3 accumulates for cleanup sprints
-
-### Terminal/CLI Hygiene
-
-- **Help text must be exhaustive**: all commands, parameters, rules in `-h`
-- **Error messages must be actionable**: "API timeout (15s): check proxy 127.0.0.1:7890"
-- **Progress for >3s ops**: spinner or counter
-- **Exit codes**: 0=success, non-zero=failure — for automation
+- 帮助文本必须详尽：`-h` 列出所有命令、参数、选项
+- 错误消息必须可操作：不是"出错了"，而是"超时(15s)：检查网络连接"
+- 超过 3 秒的操作显示进度指示
+- 退出码：0=成功，非0=失败
 
 ---
 
-## Knowledge Management
+## 知识管理
 
-### The AGENTS.md Contract
+### 项目入口文件契约
 
-First file any AI agent reads. Must contain:
+`AGENTS.md`（或 `CLAUDE.md`）是 AI Agent 进入项目读的第一个文件，必须包含：
 
-| Section | Content |
-|---------|---------|
-| How to Run | Exact install + start commands |
-| What This Is | Architecture summary (3-5 bullets) |
-| Project Structure | Key directories + purposes |
-| Tech Stack | Layer → technology table |
-| Key Constraints | Pitfalls, gotchas, source quirks, network issues |
-| Current State | Done + P0/P1 pending |
-| Document Index | All docs with content descriptions |
+| 章节 | 内容 |
+|------|------|
+| 怎么跑 | 安装 + 启动的精确命令 |
+| 这是什么 | 架构摘要（3-5 条要点） |
+| 项目结构 | 关键目录及用途 |
+| 技术栈 | 分层→技术映射表 |
+| 关键约束 | 坑位、语法陷阱、数据源特性 |
+| 当前状态 | 已完成 + P0/P1 待办 |
+| 文档索引 | 所有文档及内容描述 |
 
-**Maintenance**: net growth ≤ 30 lines/update. Move narratives to git history or CHANGES.md.
+**维护规则**：每次更新净增 ≤ 30 行。超过就是在写变更日志。
 
-### Document Separation
+### 文档职责分离
 
-| Document | Audience | Scope |
-|----------|----------|-------|
-| AGENTS.md | AI agents | Rules, constraints, quick start |
-| README.md | Humans | Overview, architecture, version history |
-| User Manual | End users | Commands, workflows, FAQ |
-| Architecture Docs | Developers | Modules, data flow, API |
-| Milestone Docs | PM/Team | Progress, deliverables, criteria |
-| ISSUES.md | Team | Bugs, debt, enhancements |
-| CHANGES.md | Everyone | Chronological version log |
+| 文档 | 受众 | 内容 |
+|------|------|------|
+| 项目入口文件 | AI Agent | 规则、约束、结构、快速启动 |
+| README | 人类 | 概述、架构图、版本历史 |
+| 使用手册 | 终端用户 | 命令参考、工作流、FAQ |
+| 架构文档 | 开发者 | 模块细节、数据流、API |
+| 里程碑文档 | PM/团队 | 阶段进度、交付物、验证标准 |
+| Issue 追踪 | 团队 | Bug、技术债、增强请求 |
 
-### Knowledge Decay Prevention
+### 知识衰减预防
 
-After every session, check:
-- [ ] All manual commands still work?
-- [ ] Config keys in docs still valid?
-- [ ] AGENTS.md constraints reflect latest pitfalls?
-- [ ] README version matches latest tag?
-- [ ] No relative time references ("recently", "last week")?
-
----
-
-## Skill Coordination
-
-| Skill | Stage | Role |
-|-------|-------|------|
-| `karpathy-guidelines` | Step 3 | Constrain coding: simplicity, surgical, goal-driven |
-| `neat-freak` | Step 5 | OCD-level doc reconciliation |
-| `dev-flow` | All | Orchestrator |
-
-**Pattern:**
-```
-User: "build X"
-→ dev-flow: plan steps
-→ karpathy-guidelines: constrain implementation
-→ neat-freak: sync all docs
-→ ship: commit + push
-```
+每次开发会话后检查：
+- 手册里的命令还能用吗？
+- 文档引用的配置键名还有效吗？
+- 入口文件里的约束是最新的踩坑记录吗？
+- README 版本号跟最新 tag 一致吗？
+- 有没有"最近"、"上周"这种相对时间表述需要更新？
 
 ---
 
-## Anti-Patterns Catalog
+## 可选扩展
 
-| Anti-Pattern | Damage | Fix |
-|-------------|--------|-----|
-| Skip plan, code directly | Wrong direction wastes everything | 3-6 verifiable steps first |
-| Skip verification | Syntax errors at commit | Syntax check after every file |
-| Skip sync | Docs rot, next agent hits pitfalls | Sync in same commit |
-| 10 changes in 1 commit | Can't bisect breakage | One logical change per commit |
-| Rename YAML key without grep | 8+ residual hardcoded refs | `rg "old_key"` before rename |
-| "While I'm here" refactor | Unrelated bugs introduced | Open ISSUE; stay surgical |
-| `except Exception: pass` | Masks real bugs | Catch specific; log WARNING |
-| Hardcode config values | Change = redeploy, not reconfigure | Extract to config file |
-| Copy-paste 4+ times | Fix in 1 place, 3 copies broken | Extract on 3rd duplication |
-| Commit "fix bugs" | Useless for history | "Fix: preclose type error in Baostock weekly" |
-| Chinese full-width in code | SyntaxError on Windows | ASCII punctuation only |
-| Push through proxy | Connection reset silently | `git -c http.proxy= push` |
+本 skill 独立可用。如果你的项目也安装了以下 skill，可以形成更强的工作流：
+
+| Skill | 增强环节 | 作用 |
+|-------|---------|------|
+| `karpathy-guidelines` | Step 3 实现 | 约束编码行为：简洁优先、手术级修改 |
+| `neat-freak` | Step 5 同步 | 洁癖级文档审计与修正 |
+
+> 以上为可选增强，不是依赖。没有它们，dev-flow 照常工作。
 
 ---
 
-## Quick Reference
+## 反模式速查
+
+| 反模式 | 后果 | 正确做法 |
+|--------|------|---------|
+| 跳过规划直接写代码 | 方向错了全白干 | 先列 3-6 步可验证计划 |
+| 跳过验证 | 提交后才发现语法错误 | 每次改文件后立即检查语法 |
+| 跳过同步 | 文档腐烂，下一个 Agent 踩同样的坑 | 代码和文档同一次提交 |
+| 10 个改动塞一个提交 | 出问题无法二分定位 | 一次一个逻辑变更 |
+| 顺手重构无关代码 | 引入不相干的 Bug | 开 Issue，保持手术级精准 |
+| `except Exception: pass` | 掩盖真实 Bug | 捕获具体异常，记 WARNING |
+| 把配置值硬编码在代码里 | 改配置变成改代码+重部署 | 提取到配置文件，文档化默认值 |
+| 复制粘贴 4 次以上 | 修一处漏三处 | 第三次出现时提取 |
+| 提交信息"fix bugs" | 对历史追溯毫无用处 | "Fix: 周线查询 preclose 类型错误" |
+
+---
+
+## 快速参考
 
 ```
-Plan → Diagnose → Implement → Verify → Sync → Ship
-  ^                                              |
-  +————— if verify fails ———————————————————————+
-
-Config change:  rg old → change → grep → sync → commit
-Bug fix:        repro → test → fix → verify → ISSUES → commit
-New feature:    plan → diagnose → code → syntax → functional → docs → commit
+配置变更:  grep 旧键 → 修改 → 再 grep → 同步文档 → 提交
+Bug 修复:  复现 → 写测试 → 修复 → 验证 → 更新 Issue → 提交
+新功能:    规划 → 诊断 → 实现 → 语法 → 功能测试 → 同步文档 → 提交
 ```
