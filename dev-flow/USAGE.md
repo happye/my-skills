@@ -19,58 +19,44 @@
 
 **用户**："给 CLI 加一个导出 CSV 的功能"
 
-**流程**：
 1. **Plan**：① 研究 CLI 入口结构 ② 新增 export 命令 ③ 加参数解析 ④ 更新帮助文本
 2. **Diagnose**：grep 现有命令注册方式，了解参数解析模式
 3. **Implement**：只改 CLI 相关文件，新增导出模块
-4. **Verify**：语法检查 → import 检查 → `--help` 确认参数显示正确
+4. **Verify**：语法检查 → import 检查 → --help 确认参数显示正确
 5. **Sync**：使用手册加"导出"章节，README 更新功能列表
-6. **Ship**：`git commit -m "feat: 新增 CSV 导出命令"`
+6. **Ship**：git commit -m "feat: 新增 CSV 导出命令"
 
 ### 场景 2：修改配置键名
 
-**用户**："把配置里 `timeout` 改成 `request_timeout`"
+**用户**："把配置里 timeout 改成 request_timeout"
 
-**流程**：
 1. **Plan**：改名 + 全局 grep + 同步文档
-2. **Diagnose**：grep 全项目找所有 `"timeout"` 的硬编码引用
+2. **Diagnose**：grep 全项目找所有硬编码引用
 3. **Implement**：改配置 + 改所有引用处 + 改帮助文本
 4. **Verify**：确认所有引用已更新，运行测试
-5. **Sync**：文档中所有提到 `timeout` 的地方同步更新
+5. **Sync**：文档中所有提到旧键名的地方同步更新
 6. **Ship**：一次提交包含所有改动
 
 ### 场景 3：Bug 修复
 
-**用户**："查询时报错 `KeyError: 'result'`"
+**用户**："查询时报错 KeyError"
 
-**流程**：
 1. **Plan**：复现 → 定位 → 修复 → 验证
-2. **Diagnose**：追踪调用链，定位 `result` 字段的来源，确认是 API 返回格式变了还是代码假设错了
+2. **Diagnose**：追踪调用链，定位字段来源
 3. **Implement**：加防御性取值 + 日志
-4. **Verify**：确认不再报错，确认降级路径正常工作
+4. **Verify**：确认不再报错，确认降级路径正常
 5. **Sync**：Issue 追踪标记已解决
-6. **Ship**：`git commit -m "fix: API 返回缺失 result 字段时的 KeyError"`
+6. **Ship**：git commit -m "fix: API 返回缺失字段时的 KeyError"
 
 ### 场景 4：阶段收尾
 
 **用户**："这个阶段做完了"
 
-**流程**：
-1. Step 5 升级为完整审计
+1. Step 5（Sync）升级为完整审计
 2. 逐文件检查：入口文件、README、手册、里程碑、Issue 追踪
 3. 删过时内容、合并重复、修正版本号
 4. 输出变更摘要
-5. Ship：标记里程碑 + `git tag v0.x.y`
-
-## 可选 Skill 配合
-
-如果项目中恰好也安装了以下 skill，可以配合使用（非必需）：
-
-| 场景 | dev-flow | + karpathy-guidelines | + neat-freak |
-|------|:--:|:--:|:--:|
-| 日常功能开发 | 编排全程 | 约束编码风格 | 强化文档同步 |
-| 单文件小修改 | 精简版 | 约束"不顺手重构" | — |
-| 阶段收尾 | 完整版 | — | 全量文档审计 |
+5. Ship：标记里程碑 + git tag v0.x.y
 
 ## 快速决策
 
