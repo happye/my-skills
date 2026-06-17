@@ -1,194 +1,336 @@
-﻿---
+---
 name: dev-flow
 description: >
-  Full-cycle development workflow for AI-assisted coding — plan, implement, verify, sync, ship.
-  Encodes battle-tested habits: pre-work planning, surgical coding, knowledge sync, issue tracking,
-  and clean Git hygiene. Trigger when starting new work, completing a phase, or when the user
-  says "dev flow", "开发流程", "按流程走", "标准流程".
-  NOT for trivial one-liner fixes — use judgment.
+  Full-cycle development workflow for AI-assisted coding. Plan, diagnose, implement,
+  verify, sync, ship. Encodes battle-tested habits: pre-work planning, surgical coding,
+  knowledge sync, issue tracking, clean Git hygiene. Integrates industry patterns:
+  YAGNI, Rule of Three, Test-Driven Bug Fixing, Graceful Degradation, SemVer,
+  Configuration-Driven Development, Network-Aware Coding.
+  Trigger when: starting new work, completing a phase, "dev flow", "按流程走", "标准流程".
+  NOT for trivial one-liner fixes.
 ---
 
-# Dev-Flow — 开发工作流
+# Dev-Flow — AI-Assisted Development Workflow
 
-> Full-cycle development workflow. From idea to shipped commit. Cross-platform: Codex, Claude Code, OpenCode, OpenClaw.
+> Full-cycle workflow. From idea to shipped commit. Cross-platform.
 
 ## Core Philosophy
 
-Development is not "writing code" - it is "delivering value". Writing code is only 50%. The other 50% is verification, synchronization, documentation, and shipping.
+Development is not "writing code" — it is "delivering value". Code is 50%.
+The other 50%: verification, sync, docs, shipping.
 
 Five principles:
 
-1. **Plan before coding** — List steps, each with a verification criterion
-2. **Surgical changes only** — Touch only what you must
-3. **Verify immediately** — Syntax check, import test, end-to-end run
-4. **Sync immediately** — Docs must not lag behind code
-5. **Ship immediately** — Don't batch commits; each step is independently traceable
+1. **Plan before coding** — Verifiable steps before any code
+2. **Surgical changes only** — Every line traces to the request
+3. **Verify immediately** — Syntax → Import → Functional, in order
+4. **Sync immediately** — Docs follow code; never lag behind
+5. **Ship immediately** — Atomic commits, push right after
 
 ---
 
 ## Standard Workflow (6 Steps)
+
+```
+Plan → Diagnose → Implement → Verify → Sync → Ship
+  ^                                              |
+  +————— if verify fails ———————————————————————+
+```
 
 ### Step 1: Plan
 
 Input: user request
 Output: plan (3-6 verifiable steps)
 
-- Decompose the request into verifiable steps
-- Each step has a clear verification method (e.g. "syntax check passes", "import succeeds")
-- Mark first step as `in_progress`
-- If the request is ambiguous, ask before planning
+- Decompose request into verifiable steps; each with a verification criterion
+- Mark first step `in_progress`; keep exactly one active
+- If ambiguous, ask before planning — don't guess
 
 ### Step 2: Diagnose
 
 Input: planned steps
-Output: understanding of what to change and where
+Output: understanding what to change, where, and why
 
-- **Read code first, write code second**. Never assume code structure.
-- Use grep/rg to trace all hardcoded references
-- If the change involves config key names, grep the entire project for residual references
-- Understand the data flow: where data comes from, which layers it passes through, where it ends up
+- **Read code first, write code second**. Never assume structure.
+- `rg` to trace all hardcoded references (especially config key names)
+- Map data flow: source → layers → destination. Know which fields each layer consumes.
+- **For bugs**: reproduce first, then fix. Unreproducible = unverifiable.
 
 ### Step 3: Implement
 
 Input: diagnosis results
-Output: modified code (passing syntax check)
+Output: modified code (syntax-clean)
 
-- **Surgical changes only**: every changed line traces back to the user request
-- **Match existing style**: even if you think there is a better way, stay consistent first
-- **No speculative features**: don't build for "future needs"
-- **YAML key change checklist**:
-  - [ ] grep entire project for residual hardcoded references
-  - [ ] Is the field available in the data source
-  - [ ] Help text synchronized
-  - [ ] User manual synchronized
+- **Surgical**: every changed line traces to the request
+- **Style-consistent**: match existing patterns, even if you'd do it differently
+- **No speculation**: don't build for unrequested future needs
+
+**Config/YAML change checklist:**
+- [ ] `rg "old_key"` across entire project before rename
+- [ ] Field available in all active data sources
+- [ ] CLI help text updated
+- [ ] User manual updated
 
 ### Step 4: Verify
 
 Input: modified code
 Output: verified code
 
-Three verification layers: Syntax -> Import -> Functional
+Three layers, must pass each before proceeding:
 
 ```python
-# 1. Syntax check
+# L1: Syntax
 python -c "import py_compile; py_compile.compile('file.py', doraise=True)"
 
-# 2. Import check
+# L2: Import
 python -c "from module import Class; print('OK')"
 
-# 3. Functional verification (if applicable)
+# L3: Functional
 python tests/test_xxx.py
 ```
 
-- If the project has a test suite, run related tests
-- If verification fails, return to Step 3 and fix - don't skip
+- **For bugs**: write failing test BEFORE fixing, then verify it passes
+- If any layer fails, return to Step 3 — don't skip
 
 ### Step 5: Sync
 
 Input: verified code
 Output: updated documentation
 
-**Code changed, docs must follow.** Standard sync scope:
-
 | Change Type | Docs to Sync |
 |------------|-------------|
-| New command/parameter | User manual + start.py help text |
-| New feature/module | README version status + milestone docs |
-| Bug fix | ISSUES.md status update |
-| Config change | User manual config section + AGENTS.md |
-| Architecture change | Architecture documentation |
+| New command/parameter | Manual + help text |
+| New feature/module | README + milestone docs |
+| Bug fix | ISSUES.md |
+| Config change | Manual + AGENTS.md |
+| Architecture change | Architecture docs |
 
-Sync principles:
-- **Don't duplicate content across files**: README for architecture, manual for commands, milestones for progress
-- **Delete over retain**: outdated rule descriptions, deprecated command examples - delete them
-- **AGENTS.md net growth <= 30 lines**: if more, you are stuffing in historical narrative that belongs elsewhere
+**Sync principles:**
+- **No duplication**: README=architecture, manual=commands, milestones=progress
+- **Delete > retain**: outdated descriptions, deprecated examples — delete them
+- **AGENTS.md net growth ≤ 30 lines**: if more, you're writing changelog, not manual
 
-### Step 6: Commit and Push (Ship)
+### Step 6: Ship (Commit & Push)
 
-Input: synced documentation
+Input: synced docs
 Output: commit on GitHub
 
 ```bash
 git add <files>
-git commit -m "concise description: what changed and why"
+git commit -m "type: what changed, why, impact scope"
 git push
 ```
 
-Commit conventions:
-- **Detailed commit messages**: explain what changed, why, and impact scope
-- **Independent commits per step**: don't batch 10 changes into one commit
-- **Push immediately after commit**: don't leave changes local
-- **Network issues**: if proxy blocks GitHub, use `git -c http.proxy= push`
+**Commit discipline:**
+- **Atomic**: one logical change per commit
+- **Descriptive**: explain what, why, impact — never "fix bugs"
+- **Push immediately**: never batch commits locally
+- **Tag releases**: `git tag v0.x.y` after milestone completion
 
 ---
 
-## Cross-Session Knowledge Management
-
-### Knowledge Assets
-
-| File | Purpose | Update Trigger |
-|------|---------|---------------|
-| `AGENTS.md` | AI Agent entry manual | Project structure/tech stack/constraint changes |
-| `README.md` | Human-readable overview | Version upgrades/architecture changes |
-| `ISSUES.md` | Issue tracking | When issues are found/fixed |
-| `docs/*里程碑.md` | Phase progress | When each phase completes |
-
-### Issue Tracking Convention (ISSUES.md)
-
-Each issue contains:
-```
-### ISS-XXX: short description
-- Status: done/in_progress/pending
-- Priority: P0(critical)/P1(important)/P2(normal)/P3(optional)
-- Description: one-sentence problem statement
-- Update log: reverse chronological status changes
-```
-
----
-
-## Industry Best Practices Integrated
+## Industry Best Practices
 
 ### YAGNI (You Ain't Gonna Need It)
-> Don't build features for "future needs". Core constraint of Step 3.
+Don't build for unrequested future needs. Every line has maintenance cost.
+Speculative code is negative value.
 
 ### Boy Scout Rule
-> Leave code cleaner than you found it. BUT: only clean up orphans from YOUR changes. Don't proactively refactor unrelated code.
+Leave code cleaner than you found it. BUT: only clean orphans from YOUR changes.
+Never refactor unrelated code "while you're here".
 
 ### Single Responsibility
-> One function, one thing. If a function exceeds 50 lines, consider splitting.
+One function, one thing. If >50 lines, consider splitting.
+If you need "and" to describe a function, it does too much.
 
 ### Fail Fast
-> Validate inputs at function entry. Invalid input returns immediately.
+Validate at function entry. Bad data returns immediately with a clear message.
+Don't let errors propagate through layers.
 
 ### Separation of Concerns
-> Data fetching, business logic, presentation — three layers that don't intrude on each other.
+Data fetching → Business logic → Presentation. Three layers, no intrusion.
+Changing UI must not require changing DB layer.
+
+### The Rule of Three
+- 1st time: write it
+- 2nd time: copy with `# TODO: extract`
+- 3rd time: refactor into shared utility
+
+Premature abstraction > duplication. Wait for the pattern to prove itself.
+
+### Test-Driven Bug Fixing
+1. Write failing test that reproduces the bug
+2. Apply the fix
+3. Verify test passes
+4. Commit test + fix together
+
+### Semantic Versioning
+`vMAJOR.MINOR.PATCH` — MAJOR: breaking, MINOR: new feature (compatible), PATCH: bug fix.
 
 ---
 
-## Coordination with Other Skills
+## Battle-Tested Patterns
 
-| Skill | Position in Workflow |
-|-------|---------------------|
-| `karpathy-guidelines` | Step 3 (Implement) — constrains coding behavior |
-| `neat-freak` | Step 5 (Sync) — reviews and corrects all docs |
-| `dev-flow` (this file) | Entire workflow — orchestrates the above skills |
+### Configuration-Driven Development
 
-**Recommended usage**:
+Config key names are API contracts. Treat renaming as breaking changes.
+
+**Before renaming a config key:**
+- [ ] `rg "old_key"` across entire project (Python + YAML + docs + tests)
+- [ ] Check test fixtures and expected outputs
+- [ ] Check CLI help text and manuals
+
+**After renaming:**
+- [ ] Full test suite
+- [ ] Manual test of affected CLI commands
+- [ ] Update ISSUES.md if the change fixes a bug
+
+### Graceful Degradation (Multi-Source Data)
+
 ```
-User: "build feature X"
-Agent: 1) Use dev-flow to plan steps
-       2) Follow karpathy-guidelines during implementation
-       3) Run neat-freak after completion to sync docs
-       4) Commit and push
+Primary → Fallback1 → Fallback2 → Soft Failure
+```
+
+- Each fallback needs a clear trigger (timeout, error code, missing field)
+- Never silently return partial data — log WARNING at minimum
+- Missing optional fields → skip dependent filters, don't crash
+- Network errors → exponential backoff (1s, 2s, 4s) then degrade
+- Document: which fields each source provides, which are missing
+
+**Anti-pattern**: `except Exception: return {}` — masks real bugs.
+
+### Script Lifecycle
+
+Temporary scripts:
+- Prefix: `_xxx.py` (underscore = disposable)
+- Delete after use, never commit
+- If permanent, move to `tests/test_xxx.py`, remove underscore
+
+Permanent scripts:
+- Must work after fresh clone
+- Dependencies installable via documented method
+- Environmental assumptions documented in AGENTS.md
+
+### Network-Aware Coding
+
+- **Proxy bypass**: financial APIs often fail through corporate proxies
+- **Git + proxy**: `git -c http.proxy= -c https.proxy= push` when blocked
+- **Timeout everything**: default 15s, critical paths 5s
+- **Retry with backoff**: 1-3 retries for transient failures
+
+### Issue Tracking Discipline
+
+```
+### ISS-XXX: short description
+- Status: done | in_progress | pending
+- Priority: P0(critical) | P1(important) | P2(normal) | P3(optional)
+- Description: one sentence
+- Direction: feature area / milestone phase
+- Dependencies: ISS-xxx, ISS-yyy
+- Update log: reverse chronological, with dates
+```
+
+**Rules:**
+- Every bug found gets ISS number BEFORE fixing
+- Mark resolved after verification, not after coding
+- P0 blocks milestone; P3 accumulates for cleanup sprints
+
+### Terminal/CLI Hygiene
+
+- **Help text must be exhaustive**: all commands, parameters, rules in `-h`
+- **Error messages must be actionable**: "API timeout (15s): check proxy 127.0.0.1:7890"
+- **Progress for >3s ops**: spinner or counter
+- **Exit codes**: 0=success, non-zero=failure — for automation
+
+---
+
+## Knowledge Management
+
+### The AGENTS.md Contract
+
+First file any AI agent reads. Must contain:
+
+| Section | Content |
+|---------|---------|
+| How to Run | Exact install + start commands |
+| What This Is | Architecture summary (3-5 bullets) |
+| Project Structure | Key directories + purposes |
+| Tech Stack | Layer → technology table |
+| Key Constraints | Pitfalls, gotchas, source quirks, network issues |
+| Current State | Done + P0/P1 pending |
+| Document Index | All docs with content descriptions |
+
+**Maintenance**: net growth ≤ 30 lines/update. Move narratives to git history or CHANGES.md.
+
+### Document Separation
+
+| Document | Audience | Scope |
+|----------|----------|-------|
+| AGENTS.md | AI agents | Rules, constraints, quick start |
+| README.md | Humans | Overview, architecture, version history |
+| User Manual | End users | Commands, workflows, FAQ |
+| Architecture Docs | Developers | Modules, data flow, API |
+| Milestone Docs | PM/Team | Progress, deliverables, criteria |
+| ISSUES.md | Team | Bugs, debt, enhancements |
+| CHANGES.md | Everyone | Chronological version log |
+
+### Knowledge Decay Prevention
+
+After every session, check:
+- [ ] All manual commands still work?
+- [ ] Config keys in docs still valid?
+- [ ] AGENTS.md constraints reflect latest pitfalls?
+- [ ] README version matches latest tag?
+- [ ] No relative time references ("recently", "last week")?
+
+---
+
+## Skill Coordination
+
+| Skill | Stage | Role |
+|-------|-------|------|
+| `karpathy-guidelines` | Step 3 | Constrain coding: simplicity, surgical, goal-driven |
+| `neat-freak` | Step 5 | OCD-level doc reconciliation |
+| `dev-flow` | All | Orchestrator |
+
+**Pattern:**
+```
+User: "build X"
+→ dev-flow: plan steps
+→ karpathy-guidelines: constrain implementation
+→ neat-freak: sync all docs
+→ ship: commit + push
 ```
 
 ---
 
-## Anti-Patterns
+## Anti-Patterns Catalog
 
-- Skip planning -> start coding directly (wrong direction wastes everything)
-- Skip verification -> commit only to find syntax errors
-- Skip sync -> docs rot, next person hits the same pitfalls
-- 10 changes in one commit -> cannot precisely locate issues
-- Change YAML key names without grepping the entire project -> residual hardcoded references
-- "While I'm here" refactoring of adjacent unrelated code -> introduces new bugs
+| Anti-Pattern | Damage | Fix |
+|-------------|--------|-----|
+| Skip plan, code directly | Wrong direction wastes everything | 3-6 verifiable steps first |
+| Skip verification | Syntax errors at commit | Syntax check after every file |
+| Skip sync | Docs rot, next agent hits pitfalls | Sync in same commit |
+| 10 changes in 1 commit | Can't bisect breakage | One logical change per commit |
+| Rename YAML key without grep | 8+ residual hardcoded refs | `rg "old_key"` before rename |
+| "While I'm here" refactor | Unrelated bugs introduced | Open ISSUE; stay surgical |
+| `except Exception: pass` | Masks real bugs | Catch specific; log WARNING |
+| Hardcode config values | Change = redeploy, not reconfigure | Extract to config file |
+| Copy-paste 4+ times | Fix in 1 place, 3 copies broken | Extract on 3rd duplication |
+| Commit "fix bugs" | Useless for history | "Fix: preclose type error in Baostock weekly" |
+| Chinese full-width in code | SyntaxError on Windows | ASCII punctuation only |
+| Push through proxy | Connection reset silently | `git -c http.proxy= push` |
+
+---
+
+## Quick Reference
+
+```
+Plan → Diagnose → Implement → Verify → Sync → Ship
+  ^                                              |
+  +————— if verify fails ———————————————————————+
+
+Config change:  rg old → change → grep → sync → commit
+Bug fix:        repro → test → fix → verify → ISSUES → commit
+New feature:    plan → diagnose → code → syntax → functional → docs → commit
+```
