@@ -8,6 +8,7 @@ Personal collection of AI Agent skills. Each skill is self-contained and depende
 |-------|-------------|
 | `dev-flow` | Universal development workflow: plan, diagnose, implement, verify, sync, ship. Self-contained, zero dependencies, works on any project. Integrates YAGNI, Rule of Three, TDD Bug Fixing, Graceful Degradation, SemVer. |
 | `fin-crisis-monitor` | 金融危机地基信号监控：美债10年收益率 + 美元指数定时预警系统。多数据源容错（东方财富 push2/K线 + 新浪）、三级双向预警（🟡🟠🔴 + 共振）、QuickChart 走势图、微信推送。Python 零依赖。 |
+| `harness-project-init` | 新项目初始化的 Harness Engineering 一键搭建：9 阶段脚手架（仓库/环境/架构/Agent架构/反馈/上下文/维护/**记忆资产/纪律门禁**）+ 9 种主流 Agent 工具配置（AGENTS.md/CLAUDE.md/Copilot/Cursor/Windsurf/Cline/Aider/Codex/Gemini）+ 用户协作偏好固化。官方信源 + 真实项目对抗审查实证。 |
 
 ## Installation
 
@@ -75,4 +76,7 @@ Agent: Plan → Diagnose → Implement → Verify → Sync → Ship  (dev-flow)
 
 User: "部署金融危机监控"
 Agent: 复制脚本 → 生成cron配置 → 注册定时任务  (fin-crisis-monitor)
+
+User: "新建项目"
+Agent: 9 阶段脚手架 + 多工具配置 + 记忆资产 + 纪律门禁  (harness-project-init)
 ```
