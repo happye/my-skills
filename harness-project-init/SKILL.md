@@ -100,7 +100,7 @@ description: >-
 - Anthropic: Scaling Managed Agents (2026-04-08)：harness 假设衰减与稳定接口
 - Mitchell Hashimoto: My AI Adoption Journey (2026-02-05)：Harness Engineering 术语源起
 - Martin Fowler / Thoughtworks Technology Radar (2026-04-02)：Feedforward/Feedback 框架
-- 真实项目实证：某 A 股研究项目 2026-08-29 两轮对抗审查（69 条发现）+ 259 条提交考古（纪律门禁与记忆铁律的来源）
+- 真实项目实证：某长期开发项目 2026-08-29 两轮对抗审查（69 条发现）+ 259 条提交考古（纪律门禁与记忆铁律的来源）
 - agents.md 标准: https://agents.md/ (Linux Foundation / AAIF)
 - Claude Code 文档: https://code.claude.com/docs/
 - Cline Rules 文档: https://docs.cline.bot/features/cline-rules

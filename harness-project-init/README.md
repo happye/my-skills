@@ -5,7 +5,7 @@
 
 ## 这是什么
 
-一个 QClaw Skill。当你说"新建项目""搭建脚手架""harness"时自动触发，帮你：
+一个跨工具通用的 AI Agent Skill。当你说"新建项目""搭建脚手架""harness"时自动触发，帮你：
 
 1. 生成标准目录结构和文档体系
 2. 搭建让 Agent 能自主开发的环境（init 脚本、特性列表、进度追踪）
@@ -21,7 +21,7 @@
 
 ## 触发方式
 
-在 QClaw 对话中说以下任意关键词：
+在任意支持 Skill 机制的 Agent 工具对话中说以下任意关键词：
 
 ```
 新建项目 / 初始化项目 / 搭建脚手架 / harness / 新仓库 /
@@ -162,7 +162,20 @@ AI: （自动触发 skill）
 
 ## 安装
 
-本 Skill 位于用户级 skill 目录，各工具自动加载。已同步三份：`~/.claude/skills/harness-project-init/`（Claude Code）、`~/.qclaw/skills/harness-project-init/`（QClaw）、`~/.codex/skills/harness-project-init/`（Codex）。更新任何一份后，把整个目录复制到其余两份保持一致（正是本 skill 门禁 7 教的做法）。
+把整个目录复制到你所用 Agent 工具的用户级 skill 目录：
+
+```bash
+# Claude Code
+cp -r harness-project-init ~/.claude/skills/
+
+# OpenAI Codex
+cp -r harness-project-init ~/.codex/skills/
+
+# 其他工具
+# 复制到该工具的 skill/rules 目录（路径以工具文档为准）
+```
+
+同时使用多个工具时，将目录复制到各工具的 skill 目录并保持一致——可以写一个几行的同步脚本，做法见 Stage 8 门禁 7。
 
 ## 版本
 
