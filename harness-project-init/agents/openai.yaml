@@ -1,0 +1,4 @@
+interface:
+  display_name: "Harness 初始化与模型分工"
+  short_description: "初始化工程脚手架，增量配置跨工具子 Agent 模型分工"
+  default_prompt: "使用 $harness-project-init，为当前项目增量配置按任务能力选择子 Agent 模型，并验证实际加载情况。"

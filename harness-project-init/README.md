@@ -1,7 +1,7 @@
 # Harness Project Init
 
 > 基于官方信源 + 真实项目实证的新项目 Harness Engineering 一键搭建 Skill。
-> 说"新建项目"，自动生成 9 阶段工程脚手架（含记忆资产与纪律门禁）+ 9 种主流 Agent 工具配置文件。
+> 说"新建项目"，自动生成 9 阶段工程脚手架（含记忆资产与纪律门禁）+ 按工具选择的配置文件；已有项目可只配置子 Agent 模型分工。
 
 ## 这是什么
 
@@ -75,7 +75,7 @@ Step 3: 验证与交付（文件清单 → 用户确认 → git commit）
 | Windsurf | .windsurfrules | 仓库根目录 | 6000 字符限制 |
 | Cline | *.md | .clinerules/ | 自动检测其他工具格式，规则可开关 |
 | Aider | CONVENTIONS.md | 仓库根目录 | 终端 pair programming |
-| OpenAI Codex | CODEX.md | 仓库根目录 | 零手写代码原则 |
+| OpenAI Codex | AGENTS.md + config.toml + agents/*.toml | 仓库根目录 / .codex/ | 原生角色与模型分工；CODEX.md 仅补充说明 |
 | Gemini CLI | GEMINI.md | 仓库根目录 | 多模态分析 |
 
 ## 核心原则
@@ -181,3 +181,19 @@ cp -r harness-project-init ~/.codex/skills/
 
 - v1.0 — 2026-07-22 — 初始版本
 - v2.0 — 2026-09-15 — 新增记忆资产（Stage 7）、工程纪律门禁（Stage 8）、用户协作偏好收集；吸收 Anthropic Managed Agents「harness 假设衰减」与 Martin Fowler Feedforward/Feedback 框架
+
+## v2.1：已有项目一键模型分工（2026-10-11）
+
+这是在 v2.0 记忆资产与工程门禁上增量扩展，保留九阶段和已有工具模板。无需另一个依赖 skill；整个 harness-project-init 目录可移植。
+
+在 Codex、Claude Code 或 Grok Build 中调用：
+
+> 使用 harness-project-init，只给当前项目增量配置按任务能力选择子 Agent 模型，保留原规则，并验证实际加载情况。
+
+也可运行 `python scripts/configure_subagents.py --project <项目目录> --tools codex claude --apply`；默认不加 --apply 为预览。Python 3.11+，无第三方依赖、不发模型请求、不改主模型。Grok 项目原生角色需要已核实的九角色→ID JSON；三内置类型的兼容映射才需要个人作用域。其他工具使用通用协议，不保证原生选型。详见 [模型分工指南](references/subagent-model-routing.md)。
+
+Codex／Claude 生成实际 Planner、Generator、Evaluator 配置，同时给六类专家设定模型。主控按合同调度：重大交付独立评估，简单工作直接处理，不为形式每轮启动三人。配置接受、角色发现、真实执行及真实型号分别验收。
+
+修正了旧 Codex config.json 文件名与 CODEX.md 原生加载表述；去掉固定 200+ 特性配额、强制会话重置和无条件三 Agent 并发的假设。示例模型来自官方机制及当前可用运行时，实际账号可用性仍需核对。
+
+测试：`python scripts/test_configure_subagents.py`；dry-run、重复安装、冲突零写入、字节备份、并发变更保护、失败回滚和路径边界均在隔离临时目录执行。Grok skill 可放 `~/.grok/skills/harness-project-init/`；新 skill 在已有会话的发现行为由客户端决定。

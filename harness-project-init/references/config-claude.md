@@ -64,3 +64,9 @@ CLAUDE.md 只包含 Claude Code 特有的配置：
 - 禁止事项
 
 通用规范（架构、编码、测试）在 AGENTS.md 中，CLAUDE.md 引用而非重复。
+
+## 原生子 Agent 模型分工
+
+`CLAUDE.md` 说明不是角色实例。原生角色放在 `.claude/agents/*.md`（项目）或 `~/.claude/agents/*.md`（个人），使用 name、description、tools、model 的 YAML frontmatter。示例：定位 haiku、开发／评估 sonnet、关键边界和复杂设计 opus；派发前核对当前账号、provider 和版本。
+
+读 `subagent-model-routing.md` 执行增量安装。为兼容旧版，安装器不写 effort；支持新版该字段时按官方模型能力追加。只读默认不提供 shell／Edit／Write，无法执行的验证由主控完成。新角色发现、热刷新与 `/tasks` 型号显示受版本影响，未实测不保证；官方来源：https://code.claude.com/docs/en/sub-agents 。

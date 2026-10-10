@@ -1,0 +1,25 @@
+{
+  "codex_default": ["gpt-6-luna", "medium"],
+  "codex": {
+    "task_explorer": ["gpt-6-luna", "high"],
+    "task_progress_monitor": ["gpt-6-luna", "low"],
+    "task_developer": ["gpt-6.1-sol", "medium"],
+    "task_reviewer": ["gpt-6.1-sol", "medium"],
+    "task_quality_guard": ["gpt-6.1-sol", "high"],
+    "task_architect": ["gpt-6-astra", "low"],
+    "harness_planner": ["gpt-6.1-sol", "medium"],
+    "harness_generator": ["gpt-6.1-sol", "medium"],
+    "harness_evaluator": ["gpt-6.1-sol", "medium"]
+  },
+  "claude": {
+    "task_explorer": "haiku",
+    "task_progress_monitor": "haiku",
+    "task_developer": "sonnet",
+    "task_reviewer": "sonnet",
+    "task_quality_guard": "opus",
+    "task_architect": "opus",
+    "harness_planner": "sonnet",
+    "harness_generator": "sonnet",
+    "harness_evaluator": "sonnet"
+  }
+}
